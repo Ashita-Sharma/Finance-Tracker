@@ -71,6 +71,7 @@ def dashboard():
 
     query = "SELECT * FROM TASKS WHERE user_id = ?"
     params = [session['user_id']]
+    total_balance = 0
 
     if search_query:
         query += " AND (expense_name LIKE ? OR note LIKE ?)"
@@ -94,9 +95,17 @@ def dashboard():
         cursor.execute("SELECT COUNT(*) FROM TASKS WHERE user_id = ?", (session['user_id'],))
         total = cursor.fetchone()[0]
 
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND user_id = ?", ('income', session['user_id']))
+        incomee = cursor.fetchone()[0]
+        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND user_id = ?", ('expense', session['user_id']))
+        expenses = cursor.fetchone()[0]
+        total_balance = incomee - expenses
+
 
     return render_template('dashboard.html', tasks=tasks, filter_by=filter_by,
-                           sort_by=sort_by, search_query=search_query, total=total,
+                           sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance,
                            now=date.today().isoformat())
 
 @app.route('/new-task', methods=['GET', 'POST'])
