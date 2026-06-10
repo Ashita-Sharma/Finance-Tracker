@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Log In{% endblock %}
+
+{% block content %}
+    <h1 class="text-center py-5">Log In</h1>
+
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <form method="POST" action="{{ url_for('login') }}">
+                <label for="email" class="form-label">Email address</label>
+                <input name="enteredEmail" type="email" class="form-control" id="email">
+
+                <label for="password" class="form-label">Password</label>
+                <input name="enteredPassword" type="password" class="form-control" id="password">
+
+                <div class="form-check form-switch py-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="switch" checked>
+                    <label class="form-check-label" for="switch">Remember me?</label>
+
+                </div>
+                <a href="{{ url_for('sign_up') }}" class="btn btn-primary">Sign Up</a>
+                <button type="submit" class="btn btn-primary">Log In</button>
+            </form>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Task {% endblock %}
+
+{% block content %}
+    <div class="container py-5">
+        <h1>Edit Task</h1>
+        <div class="row">
+            <div class="col-md-6">
+                <form method="POST">
+                    <label for="ExpenseName" class="form-label">Task Title</label>
+                    <input name="ExpenseName" type="text" class="form-control" value="{{ task[2] }}" required>
+                    <label for="Amount" class="form-label">Amount</label>
+                    <input name="Amount" type="integer" class="form-control" value="{{ task[3] }}" required>
+
+                    <label for="Note" class="form-label">Note</label>
+                    <input name="Note" type="text" class="form-control" value="{{ task[4] }}">
+
+                    <label for="Date" class="form-label">Deadline</label>
+                    <input type="date" name="Date" class="form-control" value="{{ task[5] }}">
+
+                    <label for="Type" class="form-label">Priority</label>
+                    <select name="Type" class="form-select">
+                        <option value="expense" {{ 'selected' if task[6] == 'expense' }}>expense</option>
+                        <option value="income" {{ 'selected' if task[6] == 'income' }}>income</option>
+                    </select>
+
+                    <label for="Category" class="form-label">Category</label>
+                    <select name="Category" class="form-select">
+                        <option value="home" {{ 'selected' if task[7] == 'home' }}>Home</option>
+                        <option value="work" {{ 'selected' if task[7] == 'work' }}>Work</option>
+                        <option value="personal" {{ 'selected' if task[7] == 'personal' }}>Personal</option>
+                    </select>
+
+                    <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

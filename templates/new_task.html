@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block title %}New Task{% endblock %}
+
+{% block content %}
+
+    <h1 class="text-center py-5">Add a new task</h1>
+
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+
+            <form action="{{ url_for('dashboard') }}" method="post">
+    <label for="ExpenseName" class="form-label">Title</label>
+    <input name="ExpenseName" type="text" class="form-control" id="ExpenseName" required>
+    <label for="Amount" class="form-label">Amount</label>
+    <input name="Amount" type="integer" class="form-control" id="Amount" required>
+
+    <label for="Note" class="form-label">Note</label>
+    <input name="Note" type="text" class="form-control" id="Note">
+
+    <label for="Date" class="form-label">Date</label>
+    <input type="date" id="Date" name="Date" class="form-control" required>
+
+    <label for="Type" class="form-label">Type</label>
+    <select name="Type" id="Type" class="form-select" required>
+        <option value="expense">expense</option>
+        <option value="income" selected>Income</option>
+    </select>
+
+
+    <label for="Category" class="form-label">Category</label>
+    <select name="Category" id="Category" class="form-select">
+        <option value="work">Work</option>
+        <option value="personal" selected>Personal</option>
+        <option value="home">Home</option>
+    </select>
+
+    <button type="submit" class="btn btn-primary mt-3">Add Task</button>
+</form>
+        </div>
+{% endblock %}
