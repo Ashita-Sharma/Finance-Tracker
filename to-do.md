@@ -1,9 +1,10 @@
 #Basics
-- Ability to log expenses
-- Ability to show sum 
-- Ability to add date
+- Ability to log expenses (done)
+- Ability to show sum (done)
+- Ability to add date (done)
 
 #More
--Ability to categorize
--Ability to change currency
--Ability to add description
+- Ability to categorize (need to do for expenses and income)
+- Ability to add description (done)
+- Showing total income and expenses
+
