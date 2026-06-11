@@ -3,11 +3,10 @@
 {% block title %}Edit Log {% endblock %}
 
 {% block content %}
-    <div class="container py-5">
+    <div class="row justify-content-center">
+    <div class="col-md-6">
         <h1>Edit Log</h1>
-        <div class="row">
-            <div class="col-md-6">
-                <form method="POST">
+        <form method="POST">
                     <label for="ExpenseName" class="form-label">Title</label>
                     <input name="ExpenseName" type="text" class="form-control" value="{{ task[2] }}" required>
                     <label for="Amount" class="form-label">Amount</label>
@@ -21,8 +20,8 @@
 
                     <label for="Type" class="form-label">Priority</label>
                     <select name="Type" class="form-select">
-                        <option value="expense" {{ 'selected' if task[6] == 'expense' }}>expense</option>
-                        <option value="income" {{ 'selected' if task[6] == 'income' }}>income</option>
+                        <option value="expense" {{ 'selected' if task[6] == 'expense' }}>Expense</option>
+                        <option value="income" {{ 'selected' if task[6] == 'income' }}>Income</option>
                     </select>
 
                     <label for="Category" class="form-label">Category</label>
@@ -35,7 +34,6 @@
                     <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
                     <a href="{{ url_for('dashboard') }}" class="btn btn-secondary mt-3">Cancel</a>
                 </form>
-            </div>
-        </div>
     </div>
+</div>
 {% endblock %}

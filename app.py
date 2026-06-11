@@ -118,11 +118,11 @@ def dashboard():
                            sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance, total_income=incomee, total_expense = expenses,
                            now=date.today().isoformat())
 
-@app.route('/new-task', methods=['GET', 'POST'])
-def new_task():
+@app.route('/new-log', methods=['GET', 'POST'])
+def new_log():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-    return render_template('new_task.html')
+    return render_template('new_log.html')
 
 @app.route('/sign_up', methods=['GET', 'POST'])
 def sign_up():
@@ -267,8 +267,8 @@ def delete_task(task_id):
     flash("Task deleted", "info")
     return redirect(url_for('dashboard'))
 
-@app.route('/edit-task/<int:task_id>', methods=['GET', 'POST'])
-def edit_task(task_id):
+@app.route('/edit-log/<int:task_id>', methods=['GET', 'POST'])
+def edit_log(task_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
@@ -296,7 +296,7 @@ def edit_task(task_id):
         cursor.execute("SELECT * FROM TASKS WHERE id = ? AND user_id = ?", (task_id, session['user_id']))
         task = cursor.fetchone()
 
-    return render_template('edit_task.html', task=task)
+    return render_template('edit_log.html', task=task)
 
 @app.route('/logout')
 def logout():

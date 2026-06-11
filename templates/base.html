@@ -15,7 +15,7 @@
             <div class="navbar-nav ms-auto">
                 {% if session.get('user_id') %}
                 <a class="nav-link" href="{{ url_for('dashboard') }}">Dashboard</a>
-                <a class="nav-link" href="{{ url_for('new_task') }}">New Log</a>
+                <a class="nav-link" href="{{ url_for('new_log') }}">New Log</a>
                 <a class="nav-link" href="{{ url_for('profile') }}">Profile</a>
                 <a class="nav-link" href="{{ url_for('logout') }}">Logout</a>
                 {% else %}

@@ -90,7 +90,7 @@
                 {% endif %}
             </td>
             <td>
-                <a href="{{ url_for('edit_task', task_id=task[0]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                <a href="{{ url_for('edit_log', task_id=task[0]) }}" class="btn btn-sm btn-outline-primary">Edit</a>
                 <a href="{{ url_for('delete_task', task_id=task[0]) }}" class="btn btn-sm btn-outline-danger"
                    onclick="return confirm('Are you sure?')">Delete</a>
             </td>
@@ -104,7 +104,7 @@
     {% if search_query %}
     No logs found for "{{ search_query }}". <a href="{{ url_for('dashboard') }}">Clear search</a>
     {% else %}
-    No logs yet. <a href="{{ url_for('new_task') }}">Add your first log!</a>
+    No logs yet. <a href="{{ url_for('new_log') }}">Add your first log!</a>
     {% endif %}
 </div>
 {% endif %}
