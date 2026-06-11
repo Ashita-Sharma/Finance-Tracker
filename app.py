@@ -4,6 +4,7 @@ import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -82,6 +83,10 @@ def dashboard():
         query += " AND type = 'expense'"
     elif filter_by == 'income':
         query += " AND type = 'income'"
+    elif filter_by == 'current_month':
+        current_month = date.today().strftime('%Y-%m')
+        query += " AND date_of LIKE ?"
+        params.append(f"{current_month}%")
 
     if sort_by == 'date_of':
         query += " ORDER BY date_of ASC"

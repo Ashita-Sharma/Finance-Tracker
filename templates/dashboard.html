@@ -22,15 +22,36 @@
     <a href="?filter=all&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-primary' if filter_by == 'all' else 'btn-outline-primary' }}">All</a>
     <a href="?filter=expense&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-danger' if filter_by == 'expense' else 'btn-outline-danger' }}">Expense</a>
     <a href="?filter=income&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-success' if filter_by == 'income' else 'btn-outline-success' }}">Income</a>
-    <span class="mx-2">|</span>
-    Income = {{total_income}}
-    <span class="mx-2">|</span>
-    Expenses = {{total_expense}}
-    <span class="mx-2">|</span>
-    Total Balance = {{total_balance}}
-
-
+    <a href="?filter=current_month&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-info' if filter_by == 'current_month' else 'btn-outline-info' }}">This Month</a>
 </div>
+
+<div class="row mb-3">
+    <div class="col-sm-4">
+        <div class="card text-bg-success">
+            <div class="card-body">
+                <h5 class="card-title">Income</h5>
+                <p class="card-text">{{ total_income }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card text-bg-danger">
+            <div class="card-body">
+                <h5 class="card-title">Expense</h5>
+                <p class="card-text">{{ total_expense }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-4">
+        <div class="card text-bg-primary">
+            <div class="card-body">
+                <h5 class="card-title">Balance</h5>
+                <p class="card-text">{{ total_balance }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 
 {% if tasks %}
 <table class="table">
