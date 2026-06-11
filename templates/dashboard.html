@@ -20,7 +20,16 @@
 
 <div class="d-flex gap-2 mb-3">
     <a href="?filter=all&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-primary' if filter_by == 'all' else 'btn-outline-primary' }}">All</a>
+    <a href="?filter=expense&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-danger' if filter_by == 'expense' else 'btn-outline-danger' }}">Expense</a>
+    <a href="?filter=income&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-success' if filter_by == 'income' else 'btn-outline-success' }}">Income</a>
     <span class="mx-2">|</span>
+    Income = {{total_income}}
+    <span class="mx-2">|</span>
+    Expenses = {{total_expense}}
+    <span class="mx-2">|</span>
+    Total Balance = {{total_balance}}
+
+
 </div>
 
 {% if tasks %}
@@ -47,7 +56,7 @@
                 {% if task[6] == 'expense' %}
                 <span class="badge bg-danger">Expense</span>
                 {% elif task[6] == 'income' %}
-                <span class="badge bg-warning">Income</span>
+                <span class="badge bg-success">Income</span>
                 {% endif %}
             </td>
             <td>
@@ -68,13 +77,13 @@
         {% endfor %}
     </tbody>
 </table>
-<div> Balance = {{total_balance}}</div>
+
 {% else %}
 <div class="alert alert-info text-center">
     {% if search_query %}
     No tasks found for "{{ search_query }}". <a href="{{ url_for('dashboard') }}">Clear search</a>
     {% else %}
-    No tasks yet. <a href="{{ url_for('new_task') }}">Add your first task!</a>
+    No tasks yet. <a href="{{ url_for('new_task') }}">Add your first log!</a>
     {% endif %}
 </div>
 {% endif %}

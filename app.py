@@ -78,9 +78,14 @@ def dashboard():
         params.append(f"%{search_query}%")
         params.append(f"%{search_query}%")
 
+    if filter_by == 'expense':
+        query += " AND type = 'expense'"
+    elif filter_by == 'income':
+        query += " AND type = 'income'"
+
     if sort_by == 'date_of':
         query += " ORDER BY date_of ASC"
-    elif sort_by == 'type': #CONFIRM THIS
+    elif sort_by == 'type':
         query += " ORDER BY CASE type WHEN 'expense' THEN 1 WHEN 'income' THEN 2 END"
     elif sort_by == 'category':
         query += " ORDER BY CASE category WHEN 'home' THEN 1 WHEN 'work' THEN 2 WHEN 'personal' THEN 3 END"
@@ -105,7 +110,7 @@ def dashboard():
 
 
     return render_template('dashboard.html', tasks=tasks, filter_by=filter_by,
-                           sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance,
+                           sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance, total_income=incomee, total_expense = expenses,
                            now=date.today().isoformat())
 
 @app.route('/new-task', methods=['GET', 'POST'])
@@ -294,4 +299,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, port=5001)
