@@ -81,9 +81,9 @@
 {% else %}
 <div class="alert alert-info text-center">
     {% if search_query %}
-    No tasks found for "{{ search_query }}". <a href="{{ url_for('dashboard') }}">Clear search</a>
+    No logs found for "{{ search_query }}". <a href="{{ url_for('dashboard') }}">Clear search</a>
     {% else %}
-    No tasks yet. <a href="{{ url_for('new_task') }}">Add your first log!</a>
+    No logs yet. <a href="{{ url_for('new_task') }}">Add your first log!</a>
     {% endif %}
 </div>
 {% endif %}
