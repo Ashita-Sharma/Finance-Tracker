@@ -88,6 +88,7 @@ def dashboard():
         query += " AND date_of LIKE ?"
         params.append(f"{current_month}%")
 
+
     if sort_by == 'date_of':
         query += " ORDER BY date_of ASC"
     elif sort_by == 'type':
@@ -125,15 +126,15 @@ def analyze():
 
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND category = ? AND user_id = ?",
-                       ('expense', 'work', session['user_id']))
-        work_expense = cursor.fetchone()[0]
-        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND category = ? AND user_id = ?",
-                       ('expense', 'home', session['user_id']))
-        home_expense = cursor.fetchone()[0]
-        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND category = ? AND user_id = ?",
-                       ('expense', 'personal', session['user_id']))
-        personal_expense = cursor.fetchone()[0]
+        cursor.execute(
+            "SELECT category, SUM(amount) FROM TASKS WHERE type = 'expense' AND user_id = ? GROUP BY category",
+            (session['user_id'],))
+        category_totals = cursor.fetchall()
+
+        expense_by_category = {row[0]: row[1] for row in category_totals}
+        home_expense = expense_by_category.get('home', 0)
+        work_expense = expense_by_category.get('work', 0)
+        personal_expense = expense_by_category.get('personal', 0)
 
         return render_template('analyze.html', work_expense=work_expense, home_expense=home_expense, personal_expense=personal_expense)
 
