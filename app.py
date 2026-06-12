@@ -118,6 +118,26 @@ def dashboard():
                            sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance, total_income=incomee, total_expense = expenses,
                            now=date.today().isoformat())
 
+@app.route('/analyze', methods = ['GET', 'POST'])
+def analyze():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND category = ? AND user_id = ?",
+                       ('expense', 'work', session['user_id']))
+        work_expense = cursor.fetchone()[0]
+        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND category = ? AND user_id = ?",
+                       ('expense', 'home', session['user_id']))
+        home_expense = cursor.fetchone()[0]
+        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND category = ? AND user_id = ?",
+                       ('expense', 'personal', session['user_id']))
+        personal_expense = cursor.fetchone()[0]
+
+        return render_template('analyze.html', work_expense=work_expense, home_expense=home_expense, personal_expense=personal_expense)
+
+
 @app.route('/new-log', methods=['GET', 'POST'])
 def new_log():
     if 'user_id' not in session:
