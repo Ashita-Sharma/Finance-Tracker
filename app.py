@@ -79,9 +79,15 @@ def dashboard():
 
     filter_type = request.args.get('filter_type', 'all')
     filter_category = request.args.get('filter_category', 'all')
+    filter_month = request.args.get('filter_month', 'all')
 
     query = "SELECT * FROM TASKS WHERE user_id = ?"
     params = [session['user_id']]
+
+    if filter_month == 'current':
+        current_month = date.today().strftime('%Y-%m')
+        query += " AND date_of LIKE ?"
+        params.append(f"{current_month}%")
 
     if filter_type == 'expense':
         query += " AND type = 'expense'"
@@ -94,6 +100,7 @@ def dashboard():
         query += " AND category = 'home'"
     elif filter_category == 'personal':
         query += " AND category = 'personal'"
+
 
     if sort_by == 'date_of':
         query += " ORDER BY date_of ASC"
@@ -121,7 +128,7 @@ def dashboard():
         total_balance = incomee - expenses
 
 
-    return render_template('dashboard.html', tasks=tasks, filter_type=filter_type, filter_category=filter_category,
+    return render_template('dashboard.html', tasks=tasks, filter_type=filter_type, filter_month = filter_month, filter_category=filter_category,
                            sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance, total_income=incomee, total_expense = expenses,
                            now=date.today().isoformat())
 
