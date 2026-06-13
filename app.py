@@ -79,15 +79,23 @@ def dashboard():
 
     filter_type = request.args.get('filter_type', 'all')
     filter_category = request.args.get('filter_category', 'all')
-    filter_month = request.args.get('filter_month', 'all')
 
-    query = "SELECT * FROM TASKS WHERE user_id = ?"
-    params = [session['user_id']]
+    selected_month = request.args.get('month', 'all')
+    selected_year = request.args.get('year', 'all')
 
-    if filter_month == 'current':
-        current_month = date.today().strftime('%Y-%m')
+    date_filter = ""
+    params_base = [session['user_id']]
+
+    if selected_year != 'all' and selected_month != 'all':
         query += " AND date_of LIKE ?"
-        params.append(f"{current_month}%")
+        params.append(f"{selected_year}-{selected_month}%")
+    elif selected_year != 'all':
+        query += " AND date_of LIKE ?"
+        params.append(f"{selected_year}%")
+    elif selected_month != 'all':
+        query += " AND strftime('%m', date_of) = ?"
+        params.append(selected_month)
+
 
     if filter_type == 'expense':
         query += " AND type = 'expense'"
@@ -121,16 +129,21 @@ def dashboard():
 
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND user_id = ?", ('income', session['user_id']))
+        cursor.execute(
+            f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND user_id = ?{date_filter}",
+            ('income', session['user_id'], *params_base[1:]))
         incomee = cursor.fetchone()[0]
-        cursor.execute("SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND user_id = ?", ('expense', session['user_id']))
+        cursor.execute(
+            f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND user_id = ?{date_filter}",
+            ('expense', session['user_id'], *params_base[1:]))
         expenses = cursor.fetchone()[0]
         total_balance = incomee - expenses
 
 
-    return render_template('dashboard.html', tasks=tasks, filter_type=filter_type, filter_month = filter_month, filter_category=filter_category,
+    return render_template('dashboard.html', tasks=tasks, filter_type=filter_type,  filter_category=filter_category,
                            sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance, total_income=incomee, total_expense = expenses,
-                           now=date.today().isoformat())
+                           selected_month=selected_month,
+                           selected_year=selected_year)
 @app.route('/analyze')
 def analyze():
     if 'user_id' not in session:

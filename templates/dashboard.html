@@ -18,14 +18,45 @@
     </div>
 </form>
 
+<form method="GET" action="{{ url_for('dashboard') }}" class="mb-4">
+    <div class="row justify-content-center">
+        <div class="col-sm-2">
+            <label class="form-label">Month</label>
+            <select name="month" class="form-select">
+                <option value="all" {{'selected' if selected_month == 'all' }}>All Months</option>
+                <option value="01" {{'selected' if selected_month == '01' }}>January</option>
+                <option value="02" {{ 'selected' if selected_month == '02' }}>February</option>
+                <option value="03" {{ 'selected' if selected_month == '03' }}>March</option>
+                <option value="04" {{ 'selected' if selected_month == '04' }}>April</option>
+                <option value="05" {{ 'selected' if selected_month == '05' }}>May</option>
+                <option value="06" {{ 'selected' if selected_month == '06' }}>June</option>
+                <option value="07" {{ 'selected' if selected_month == '07' }}>July</option>
+                <option value="08" {{ 'selected' if selected_month == '08' }}>August</option>
+                <option value="09" {{ 'selected' if selected_month == '09' }}>September</option>
+                <option value="10" {{ 'selected' if selected_month == '10' }}>October</option>
+                <option value="11" {{ 'selected' if selected_month == '11' }}>November</option>
+                <option value="12" {{ 'selected' if selected_month == '12' }}>December</option>
+            </select>
+        </div>
+        <div class="col-sm-2">
+            <label class="form-label">Year</label>
+            <select name="year" class="form-select">
+                <option value="all" {{ 'selected' if selected_year == 'all' }}>All Years</option>
+                <option value="2025" {{ 'selected' if selected_year == '2025' }}>2025</option>
+                <option value="2026" {{ 'selected' if selected_year == '2026' }}>2026</option>
+                <option value="2027" {{ 'selected' if selected_year == '2027' }}>2027</option>
+            </select>
+        </div>
+
+        <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary">Filter</button>
+        </div>
+    </div>
+</form>
 <div class="d-flex gap-2 mb-3">
     <a href="?filter_type=all&filter_category={{ filter_category }}&filter_month={{ filter_month }}&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-primary' if filter_type == 'all' else 'btn-outline-primary' }}">All</a>
     <a href="?filter_type=expense&filter_category={{ filter_category }}&filter_month={{ filter_month }}&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-danger' if filter_type == 'expense' else 'btn-outline-danger' }}">Expense</a>
     <a href="?filter_type=income&filter_category={{ filter_category }}&filter_month={{ filter_month }}&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-success' if filter_type == 'income' else 'btn-outline-success' }}">Income</a>
-<div  style="width: 300px; margin-left: auto; margin-right: 0;">
-   <a href="?filter_type={{ filter_type }}&filter_category={{ filter_category }}&filter_month=current&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-info' if filter_month == 'current' else 'btn-outline-info' }}">This Month</a>
-    <a href="?filter_type={{ filter_type }}&filter_category={{ filter_category }}&filter_month=all&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-secondary' if filter_month == 'all' else 'btn-outline-secondary' }}">All Time</a>
-</div>
 
 </div>
 
