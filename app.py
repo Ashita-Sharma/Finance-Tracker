@@ -149,7 +149,17 @@ def analyze():
         work_expense = expense_by_category.get('work', 0)
         personal_expense = expense_by_category.get('personal', 0)
 
-        return render_template('analyze.html', work_expense=work_expense, home_expense=home_expense, personal_expense=personal_expense)
+        cursor.execute(
+            "SELECT category, SUM(amount) FROM TASKS WHERE type = 'income' AND user_id = ? GROUP BY category",
+            (session['user_id'],))
+        category_totals = cursor.fetchall()
+
+        income_by_category = {row[0]: row[1] for row in category_totals}
+        home_income = income_by_category.get('home', 0)
+        work_income = income_by_category.get('work', 0)
+        personal_income = income_by_category.get('personal', 0)
+
+        return render_template('analyze.html', work_expense=work_expense, home_expense=home_expense, personal_expense=personal_expense, work_income = work_income, home_income = home_income, personal_income = personal_income)
 
 
 @app.route('/new-log', methods=['GET', 'POST'])
