@@ -131,36 +131,49 @@ def dashboard():
     return render_template('dashboard.html', tasks=tasks, filter_type=filter_type, filter_month = filter_month, filter_category=filter_category,
                            sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance, total_income=incomee, total_expense = expenses,
                            now=date.today().isoformat())
-
-@app.route('/analyze', methods = ['GET', 'POST'])
+@app.route('/analyze')
 def analyze():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
+    selected_month = request.args.get('month', 'all')
+    selected_year = request.args.get('year', 'all')
+
+    date_filter = ""
+    params_base = [session['user_id']]
+
+    if selected_year != 'all' and selected_month != 'all':
+        date_filter = " AND date_of LIKE ?"
+        params_base.append(f"{selected_year}-{selected_month}%")
+    elif selected_year != 'all':
+        date_filter = " AND date_of LIKE ?"
+        params_base.append(f"{selected_year}%")
+    elif selected_month != 'all':
+        date_filter = " AND strftime('%m', date_of) = ?"
+        params_base.append(selected_month)
+
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
-        cursor.execute(
-            "SELECT category, SUM(amount) FROM TASKS WHERE type = 'expense' AND user_id = ? GROUP BY category",
-            (session['user_id'],))
-        category_totals = cursor.fetchall()
-
-        expense_by_category = {row[0]: row[1] for row in category_totals}
-        home_expense = expense_by_category.get('home', 0)
-        work_expense = expense_by_category.get('work', 0)
-        personal_expense = expense_by_category.get('personal', 0)
 
         cursor.execute(
-            "SELECT category, SUM(amount) FROM TASKS WHERE type = 'income' AND user_id = ? GROUP BY category",
-            (session['user_id'],))
-        category_totals = cursor.fetchall()
+            f"SELECT category, SUM(amount) FROM TASKS WHERE type = 'expense' AND user_id = ?{date_filter} GROUP BY category",
+            params_base)
+        expense_totals = {row[0]: row[1] for row in cursor.fetchall()}
 
-        income_by_category = {row[0]: row[1] for row in category_totals}
-        home_income = income_by_category.get('home', 0)
-        work_income = income_by_category.get('work', 0)
-        personal_income = income_by_category.get('personal', 0)
+        cursor.execute(
+            f"SELECT category, SUM(amount) FROM TASKS WHERE type = 'income' AND user_id = ?{date_filter} GROUP BY category",
+            params_base)
+        income_totals = {row[0]: row[1] for row in cursor.fetchall()}
 
-        return render_template('analyze.html', work_expense=work_expense, home_expense=home_expense, personal_expense=personal_expense, work_income = work_income, home_income = home_income, personal_income = personal_income)
-
+    return render_template('analyze.html',
+                           home_expense=expense_totals.get('home', 0),
+                           work_expense=expense_totals.get('work', 0),
+                           personal_expense=expense_totals.get('personal', 0),
+                           home_income=income_totals.get('home', 0),
+                           work_income=income_totals.get('work', 0),
+                           personal_income=income_totals.get('personal', 0),
+                           selected_month=selected_month,
+                           selected_year=selected_year)
 
 @app.route('/new-log', methods=['GET', 'POST'])
 def new_log():
