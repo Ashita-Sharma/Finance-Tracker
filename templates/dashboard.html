@@ -24,6 +24,12 @@
     <a href="?filter=income&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-success' if filter_by == 'income' else 'btn-outline-success' }}">Income</a>
     <a href="?filter=current_month&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-info' if filter_by == 'current_month' else 'btn-outline-info' }}">This Month</a>
 </div>
+<div class="d-flex gap-2 mb-3">
+    <a href="?filter=all&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-primary' if filter_by == 'all' else 'btn-outline-primary' }}">All</a>
+    <a href="?filter=work&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-danger' if filter_by == 'work' else 'btn-outline-danger' }}">Work</a>
+    <a href="?filter=home&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-success' if filter_by == 'home' else 'btn-outline-success' }}">Home</a>
+    <a href="?filter=personal&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-info' if filter_by == 'personal' else 'btn-outline-info' }}">Personal</a>
+</div>
 
 <div class="row mb-3">
     <div class="col-sm-4">

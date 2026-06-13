@@ -87,7 +87,12 @@ def dashboard():
         current_month = date.today().strftime('%Y-%m')
         query += " AND date_of LIKE ?"
         params.append(f"{current_month}%")
-
+    elif filter_by == 'home':
+        query += " AND category = 'home'"
+    elif filter_by == 'personal':
+        query += " AND category = 'personal'"
+    elif filter_by == 'work':
+        query += " AND category = 'work'"
 
     if sort_by == 'date_of':
         query += " ORDER BY date_of ASC"
