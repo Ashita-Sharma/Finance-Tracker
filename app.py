@@ -4,7 +4,6 @@ import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
-from datetime import datetime
 
 
 app = Flask(__name__)
@@ -66,7 +65,6 @@ def dashboard():
         flash("Added!", "success")
         return redirect(url_for('dashboard'))
 
-    filter_by = request.args.get('filter', 'all')
     sort_by = request.args.get('sort', 'date_of')
     search_query = request.args.get('search', '')
 
@@ -79,20 +77,23 @@ def dashboard():
         params.append(f"%{search_query}%")
         params.append(f"%{search_query}%")
 
-    if filter_by == 'expense':
+    filter_type = request.args.get('filter_type', 'all')
+    filter_category = request.args.get('filter_category', 'all')
+
+    query = "SELECT * FROM TASKS WHERE user_id = ?"
+    params = [session['user_id']]
+
+    if filter_type == 'expense':
         query += " AND type = 'expense'"
-    elif filter_by == 'income':
+    elif filter_type == 'income':
         query += " AND type = 'income'"
-    elif filter_by == 'current_month':
-        current_month = date.today().strftime('%Y-%m')
-        query += " AND date_of LIKE ?"
-        params.append(f"{current_month}%")
-    elif filter_by == 'home':
-        query += " AND category = 'home'"
-    elif filter_by == 'personal':
-        query += " AND category = 'personal'"
-    elif filter_by == 'work':
+
+    if filter_category == 'work':
         query += " AND category = 'work'"
+    elif filter_category == 'home':
+        query += " AND category = 'home'"
+    elif filter_category == 'personal':
+        query += " AND category = 'personal'"
 
     if sort_by == 'date_of':
         query += " ORDER BY date_of ASC"
@@ -120,7 +121,7 @@ def dashboard():
         total_balance = incomee - expenses
 
 
-    return render_template('dashboard.html', tasks=tasks, filter_by=filter_by,
+    return render_template('dashboard.html', tasks=tasks, filter_type=filter_type, filter_category=filter_category,
                            sort_by=sort_by, search_query=search_query, total=total, total_balance=total_balance, total_income=incomee, total_expense = expenses,
                            now=date.today().isoformat())
 
