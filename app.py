@@ -1,9 +1,12 @@
-from flask import Flask, redirect, url_for, render_template, request, flash
+from flask import Flask, redirect, url_for, render_template, request, flash, send_file
 from flask import session
 import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
+import csv
+import io
+
 
 
 app = Flask(__name__)
@@ -187,6 +190,31 @@ def analyze():
                            personal_income=income_totals.get('personal', 0),
                            selected_month=selected_month,
                            selected_year=selected_year)
+
+@app.route('/export')
+def export():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM TASKS WHERE user_id = ?", (session['user_id'],))
+        headers = [description[0] for description in cursor.description]
+        tasks = cursor.fetchall()
+
+    csv_data = io.StringIO()
+    writer = csv.writer(csv_data)
+    writer.writerow(headers)
+    writer.writerows(tasks)
+
+    mem_file = io.BytesIO(csv_data.getvalue().encode('utf-8'))
+
+    return send_file(
+        mem_file,
+        mimetype='text/csv',
+        as_attachment=True,
+        download_name='finance_report.csv'
+    )
 
 @app.route('/new-log', methods=['GET', 'POST'])
 def new_log():
