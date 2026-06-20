@@ -31,11 +31,20 @@
 
     <label for="Category" class="form-label">Category</label>
     <select name="Category" id="Category" class="form-select">
-        <option value="work">Work</option>
-        <option value="personal" selected>Personal</option>
-        <option value="home">Home</option>
+        <option value="Salary">Salary</option>
+        <option value="Food" selected>Food</option>
+        <option value="Rent">Rent</option>
+        <option value="Transport">Transport</option>
+        <option value="Entertainment">Entertainment</option>
+        <option value="Shopping">Shopping</option>
+        <option value="Utilities">Utilities</option>
+        <option value="Other">Other</option>
     </select>
-
+    <label for="Recurring" class="form-label">Recurring?</label>
+<select name="Recurring" id="Recurring" class="form-select">
+    <option value="" selected>One-time</option>
+    <option value="monthly">Monthly</option>
+</select>
     <button type="submit" class="btn btn-primary mt-3">Add Task</button>
 </form>
         </div>

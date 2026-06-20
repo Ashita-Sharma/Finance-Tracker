@@ -37,32 +37,71 @@ def init_db():
             amount INTEGER,
             note TEXT,
             date_of TEXT,
-            type TEXT DEFAULT 'medium',
-            category TEXT DEFAULT 'medium',
+            type TEXT,
+            category TEXT,
+            recurring TEXT DEFAULT NULL,
             FOREIGN KEY (user_id) REFERENCES PARTICIPANTS(id)
         )
         """)
+        conn.execute("""
+                CREATE TABLE IF NOT EXISTS BUDGETS (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    user_id INTEGER,
+                    budget_name TEXT,
+                    amount INTEGER,
+                    date_of TEXT,
+                    category TEXT DEFAULT 'medium',
+                    FOREIGN KEY (user_id) REFERENCES PARTICIPANTS(id)
+                )
+                """
+                     )
 init_db()
+def generate_recurring(user_id):
+    current_month = date.today().strftime('%Y-%m')  # e.g. "2026-06"
+    today = date.today().isoformat()                # e.g. "2026-06-15"
+
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+
+        cursor.execute(
+            "SELECT expense_name, amount, note, type, category, recurring FROM TASKS WHERE user_id = ? AND recurring IS NOT NULL GROUP BY expense_name, type, category",
+            (user_id,))
+        recurring_tasks = cursor.fetchall()
+
+        for task in recurring_tasks:
+            expense_name, amount, note, task_type, category, recurring = task
+
+            cursor.execute(
+                "SELECT 1 FROM TASKS WHERE user_id = ? AND expense_name = ? AND type = ? AND category = ? AND date_of LIKE ?",
+                (user_id, expense_name, task_type, category, f"{current_month}%"))
+            exists = cursor.fetchone()
+
+            if not exists:
+                cursor.execute(
+                    "INSERT INTO TASKS (user_id, expense_name, amount, note, date_of, type, category, recurring) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                    (user_id, amount, expense_name, note, today, task_type, category, recurring))
+
+        conn.commit()
 
 @app.route('/dashboard', methods=['GET', 'POST'])
 def dashboard():
     if 'user_id' not in session:
         return redirect(url_for('login'))
-
+    generate_recurring(session['user_id'])
     if request.method == 'POST':
         expense_name = request.form['ExpenseName']
         amount = request.form['Amount']
         note = request.form['Note']
         date_of = request.form['Date']
-        type = request.form['Type']
+        transaction_type = request.form['Type']
         category = request.form['Category']
+        recurring = request.form['Recurring'] or None  # converts "" to None
 
         with sqlite3.connect("database.db") as conn:
             cursor = conn.cursor()
             cursor.execute(
-                "INSERT INTO TASKS (user_id, expense_name, amount, note, date_of, type, category) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                (session['user_id'], expense_name, amount, note, date_of, type, category)
-            )
+                "INSERT INTO TASKS (user_id, expense_name, amount, note, date_of, type, category, recurring) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (session['user_id'], expense_name, amount, note, date_of, transaction_type, category, recurring))
             conn.commit()
 
         flash("Added!", "success")
@@ -99,18 +138,13 @@ def dashboard():
         query += " AND strftime('%m', date_of) = ?"
         params.append(selected_month)
 
+    if filter_type != 'all':
+        query += " AND type = ?"
+        params.append(filter_type)
 
-    if filter_type == 'expense':
-        query += " AND type = 'expense'"
-    elif filter_type == 'income':
-        query += " AND type = 'income'"
-
-    if filter_category == 'work':
-        query += " AND category = 'work'"
-    elif filter_category == 'home':
-        query += " AND category = 'home'"
-    elif filter_category == 'personal':
-        query += " AND category = 'personal'"
+    if filter_category != 'all':
+        query += " AND category = ?"
+        params.append(filter_category)
 
 
     if sort_by == 'date_of':
@@ -129,6 +163,22 @@ def dashboard():
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM TASKS WHERE user_id = ?", (session['user_id'],))
         total = cursor.fetchone()[0]
+
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute(
+            f"SELECT COALESCE(SUM(amount),0) FROM BUDGETS WHERE category = ? AND user_id = ?",
+            ('work', session['user_id']))
+        work = cursor.fetchone()[0]
+        cursor.execute(
+            f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE category = ? AND user_id = ?",
+            ('home', session['user_id']))
+        home = cursor.fetchone()[0]
+        cursor.execute(
+            f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE category = ? AND user_id = ?",
+            ('personal', session['user_id']))
+        personal = cursor.fetchone()[0]
+
 
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()

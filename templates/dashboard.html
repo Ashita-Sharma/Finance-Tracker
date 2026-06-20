@@ -60,11 +60,21 @@
 
 </div>
 
-<div class="d-flex gap-2 mb-3">
-    <a href="?filter_type={{ filter_type }}&filter_category=all&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-primary' if filter_category == 'all' else 'btn-outline-primary' }}">All</a>
-    <a href="?filter_type={{ filter_type }}&filter_category=work&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-danger' if filter_category == 'work' else 'btn-outline-danger' }}">Work</a>
-    <a href="?filter_type={{ filter_type }}&filter_category=home&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-success' if filter_category == 'home' else 'btn-outline-success' }}">Home</a>
-    <a href="?filter_type={{ filter_type }}&filter_category=personal&sort={{ sort_by }}" class="btn btn-sm {{ 'btn-info' if filter_category == 'personal' else 'btn-outline-info' }}">Personal</a>
+<div class="dropdown mb-3">
+    <button class="btn btn-sm btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+        Category: {{ filter_category|capitalize if filter_category != 'all' else 'All' }}
+    </button>
+    <ul class="dropdown-menu">
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'all' }}" href="?filter_type={{ filter_type }}&filter_category=all&sort={{ sort_by }}">All</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Salary' }}" href="?filter_type={{ filter_type }}&filter_category=Salary&sort={{ sort_by }}">Salary</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Food' }}" href="?filter_type={{ filter_type }}&filter_category=Food&sort={{ sort_by }}">Food</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Rent' }}" href="?filter_type={{ filter_type }}&filter_category=Rent&sort={{ sort_by }}">Rent</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Transport' }}" href="?filter_type={{ filter_type }}&filter_category=Transport&sort={{ sort_by }}">Transport</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Entertainment' }}" href="?filter_type={{ filter_type }}&filter_category=Entertainment&sort={{ sort_by }}">Entertainment</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Shopping' }}" href="?filter_type={{ filter_type }}&filter_category=Shopping&sort={{ sort_by }}">Shopping</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Utilities' }}" href="?filter_type={{ filter_type }}&filter_category=Utilities&sort={{ sort_by }}">Utilities</a></li>
+        <li><a class="dropdown-item {{ 'active' if filter_category == 'Other' }}" href="?filter_type={{ filter_type }}&filter_category=Other&sort={{ sort_by }}">Other</a></li>
+    </ul>
 </div>
 
 <div class="row mb-3">
@@ -123,13 +133,7 @@
                 {% endif %}
             </td>
             <td>
-                {% if task[7] == 'work' %}
-                <span class="badge bg-danger">Work</span>
-                {% elif task[7] == 'personal' %}
-                <span class="badge bg-info">Personal</span>
-                {% else %}
-                <span class="badge bg-warning">Home</span>
-                {% endif %}
+                <span class="badge bg-secondary">{{ task[7] }}</span>
             </td>
             <td>
                 <a href="{{ url_for('edit_log', task_id=task[0]) }}" class="btn btn-sm btn-outline-primary">Edit</a>

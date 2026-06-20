@@ -26,9 +26,15 @@
 
                     <label for="Category" class="form-label">Category</label>
                     <select name="Category" class="form-select">
-                        <option value="home" {{ 'selected' if task[7] == 'home' }}>Home</option>
-                        <option value="work" {{ 'selected' if task[7] == 'work' }}>Work</option>
-                        <option value="personal" {{ 'selected' if task[7] == 'personal' }}>Personal</option>
+                                <option value="Salary" {{ 'selected' if task[7] == 'Salary' }}>Salary</option>
+                                <option value="Food" {{ 'selected' if task[7] == 'Food' }}>Food</option>
+                                <option value="Rent" {{ 'selected' if task[7] == 'Rent' }}>Rent</option>
+                                <option value="Transport" {{ 'selected' if task[7] == 'Transport' }}>Transport</option>
+                                <option value="Entertainment" {{ 'selected' if task[7] == 'Entertainment' }}>Entertainment</option>
+                                <option value="Shopping" {{ 'selected' if task[7] == 'Shopping' }}>Shopping</option>
+                                <option value="Utilities" {{ 'selected' if task[7] == 'Utilities' }}>Utilities</option>
+                                <option value="Other"{{ 'selected' if task[7] == 'Other' }}>Other</option>
+
                     </select>
 
                     <button type="submit" class="btn btn-primary mt-3">Save Changes</button>
