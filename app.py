@@ -79,7 +79,7 @@ def generate_recurring(user_id):
             if not exists:
                 cursor.execute(
                     "INSERT INTO TASKS (user_id, expense_name, amount, note, date_of, type, category, recurring) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                    (user_id, amount, expense_name, note, today, task_type, category, recurring))
+                    (user_id, expense_name, amount, note, today, task_type, category, recurring))
 
         conn.commit()
 
@@ -90,7 +90,7 @@ def dashboard():
     generate_recurring(session['user_id'])
     if request.method == 'POST':
         expense_name = request.form['ExpenseName']
-        amount = request.form['Amount']
+        amount = request.form['Amount'].replace(',', '')
         note = request.form['Note']
         date_of = request.form['Date']
         transaction_type = request.form['Type']

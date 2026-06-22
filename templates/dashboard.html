@@ -82,7 +82,7 @@
         <div class="card text-bg-success">
             <div class="card-body">
                 <h5 class="card-title">Income</h5>
-                <p class="card-text">{{ total_income }}</p>
+                <p class="card-text">{{ "{:,}".format(total_income) }}</p>
             </div>
         </div>
     </div>
@@ -90,7 +90,7 @@
         <div class="card text-bg-danger">
             <div class="card-body">
                 <h5 class="card-title">Expense</h5>
-                <p class="card-text">{{ total_expense }}</p>
+                <p class="card-text">{{ "{:,}".format(total_expense) }}</p>
             </div>
         </div>
     </div>
@@ -98,7 +98,7 @@
         <div class="card text-bg-primary">
             <div class="card-body">
                 <h5 class="card-title">Balance</h5>
-                <p class="card-text">{{ total_balance }}</p>
+                <p class="card-text">{{ "{:,}".format(total_balance) }}</p>
             </div>
         </div>
     </div>
@@ -122,7 +122,7 @@
         {% for task in tasks %}
         <tr>
             <td>{{ task[2] }}</td>
-            <td>{{ task[3] }}</td>
+            <td>{{ "{:,}".format(task[3]) }}</td>
             <td>{{ task[4] }}</td>
             <td>{{ task[5] }}</td>
             <td>
