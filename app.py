@@ -206,38 +206,40 @@ def analyze():
     selected_year = request.args.get('year', 'all')
 
     date_filter = ""
-    params_base = [session['user_id']]
+    date_params = []
 
     if selected_year != 'all' and selected_month != 'all':
         date_filter = " AND date_of LIKE ?"
-        params_base.append(f"{selected_year}-{selected_month}%")
+        date_params.append(f"{selected_year}-{selected_month}%")
     elif selected_year != 'all':
         date_filter = " AND date_of LIKE ?"
-        params_base.append(f"{selected_year}%")
+        date_params.append(f"{selected_year}%")
     elif selected_month != 'all':
         date_filter = " AND strftime('%m', date_of) = ?"
-        params_base.append(selected_month)
+        date_params.append(selected_month)
+
+    categories = ['Salary', 'Food', 'Rent', 'Transport', 'Entertainment', 'Shopping', 'Utilities', 'Other']
+
+    expense_data = []
+    income_data = []
 
     with sqlite3.connect("database.db") as conn:
         cursor = conn.cursor()
+        for cat in categories:
+            cursor.execute(
+                f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = 'expense' AND category = ? AND user_id = ?{date_filter}",
+                (cat, session['user_id'], *date_params))
+            expense_data.append(cursor.fetchone()[0])
 
-        cursor.execute(
-            f"SELECT category, SUM(amount) FROM TASKS WHERE type = 'expense' AND user_id = ?{date_filter} GROUP BY category",
-            params_base)
-        expense_totals = {row[0]: row[1] for row in cursor.fetchall()}
-
-        cursor.execute(
-            f"SELECT category, SUM(amount) FROM TASKS WHERE type = 'income' AND user_id = ?{date_filter} GROUP BY category",
-            params_base)
-        income_totals = {row[0]: row[1] for row in cursor.fetchall()}
+            cursor.execute(
+                f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = 'income' AND category = ? AND user_id = ?{date_filter}",
+                (cat, session['user_id'], *date_params))
+            income_data.append(cursor.fetchone()[0])
 
     return render_template('analyze.html',
-                           home_expense=expense_totals.get('home', 0),
-                           work_expense=expense_totals.get('work', 0),
-                           personal_expense=expense_totals.get('personal', 0),
-                           home_income=income_totals.get('home', 0),
-                           work_income=income_totals.get('work', 0),
-                           personal_income=income_totals.get('personal', 0),
+                           categories=categories,
+                           expense_data=expense_data,
+                           income_data=income_data,
                            selected_month=selected_month,
                            selected_year=selected_year)
 

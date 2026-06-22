@@ -61,28 +61,24 @@
 </div>
 
 <script>
-    const ctx1 = document.getElementById('ExpensesDistribution');
-    new Chart(ctx1, {
+    const categories = {{ categories | tojson }};
+    const expenseData = {{ expense_data | tojson }};
+    const incomeData = {{ income_data | tojson }};
+
+    new Chart(document.getElementById('ExpensesDistribution'), {
         type: 'pie',
         data: {
-            labels: ['Home', 'Work', 'Personal'],
-            datasets: [{
-                label: 'Expenses allocated',
-                data: [{{ home_expense }}, {{ work_expense }}, {{ personal_expense }}],
-            }]
+            labels: categories,
+            datasets: [{ label: 'Expenses', data: expenseData }]
         },
         options: { responsive: true, maintainAspectRatio: false }
     });
 
-    const ctx2 = document.getElementById('IncomeDistribution');
-    new Chart(ctx2, {
+    new Chart(document.getElementById('IncomeDistribution'), {
         type: 'pie',
         data: {
-            labels: ['Home', 'Work', 'Personal'],
-            datasets: [{
-                label: 'Income received',
-                data: [{{ home_income }}, {{ work_income }}, {{ personal_income }}],
-            }]
+            labels: categories,
+            datasets: [{ label: 'Income', data: incomeData }]
         },
         options: { responsive: true, maintainAspectRatio: false }
     });
