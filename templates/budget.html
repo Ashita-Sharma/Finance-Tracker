@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block title %}Budget{% endblock %}
+
+{% block content %}
+<h1>Monthly Budgets</h1>
+
+<form method="POST" class="mb-4">
+    <div class="row">
+        {% for cat in categories %}
+        <div class="col-md-3 mb-3">
+            <label class="form-label">{{ cat }}</label>
+            <input type="number" name="{{ cat }}" class="form-control"
+                   value="{{ budget_data.get(cat, '') }}" placeholder="Set budget">
+        </div>
+        {% endfor %}
+    </div>
+    <button type="submit" class="btn btn-primary">Save Budgets</button>
+</form>
+
+<h2>Spending vs Budget (This Month)</h2>
+
+{% for cat in categories %}
+{% if budget_data.get(cat) %}
+{% set budget_amount = budget_data[cat] %}
+{% set spent = spending[cat] %}
+{% set percentage = ((spent / budget_amount) * 100) | round if budget_amount > 0 else 0 %}
+
+<div class="mb-3">
+    <div class="d-flex justify-content-between">
+        <strong>{{ cat }}</strong>
+        <span>{{ spent }} / {{ budget_amount }}</span>
+    </div>
+    <div class="progress">
+        <div class="progress-bar {{ 'bg-danger' if percentage > 100 else 'bg-warning' if percentage > 75 else 'bg-success' }}"
+             style="width: {{ [percentage, 100] | min }}%">
+            {{ percentage }}%
+        </div>
+    </div>
+    {% if percentage > 100 %}
+    <small class="text-danger">Over budget by {{ spent - budget_amount }}!</small>
+    {% endif %}
+</div>
+{% endif %}
+{% endfor %}
+
+{% endblock %}

@@ -51,6 +51,7 @@ def init_db():
                     amount INTEGER,
                     date_of TEXT,
                     category TEXT DEFAULT 'medium',
+                    UNIQUE(user_id, category),
                     FOREIGN KEY (user_id) REFERENCES PARTICIPANTS(id)
                 )
                 """
@@ -242,6 +243,49 @@ def analyze():
                            income_data=income_data,
                            selected_month=selected_month,
                            selected_year=selected_year)
+
+@app.route('/budget', methods=['GET', 'POST'])
+def budget():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+
+    categories = ['Salary', 'Food', 'Rent', 'Transport', 'Entertainment', 'Shopping', 'Utilities', 'Other']
+
+    if request.method == 'POST':
+        for cat in categories:
+            amount = request.form.get(cat, 0)
+            if amount:
+                with sqlite3.connect("database.db") as conn:
+                    cursor = conn.cursor()
+                    cursor.execute(
+                        "INSERT OR REPLACE INTO BUDGETS (user_id, category, amount) VALUES (?, ?, ?)",
+                        (session['user_id'], cat, amount))
+                    conn.commit()
+
+        flash("Budgets updated!", "success")
+        return redirect(url_for('budget'))
+
+    # Fetch existing budgets
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        cursor.execute("SELECT category, amount FROM BUDGETS WHERE user_id = ?", (session['user_id'],))
+        budget_data = {row[0]: row[1] for row in cursor.fetchall()}
+
+    # Fetch actual spending per category for current month
+    current_month = date.today().strftime('%Y-%m')
+    spending = {}
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        for cat in categories:
+            cursor.execute(
+                "SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = 'expense' AND category = ? AND user_id = ? AND date_of LIKE ?",
+                (cat, session['user_id'], f"{current_month}%"))
+            spending[cat] = cursor.fetchone()[0]
+
+    return render_template('budget.html',
+                           categories=categories,
+                           budget_data=budget_data,
+                           spending=spending)
 
 @app.route('/export')
 def export():
