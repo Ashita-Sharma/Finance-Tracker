@@ -84,4 +84,31 @@
     });
 </script>
 
+<h2>This Month vs Last Month</h2>
+
+{% for cat in categories %}
+{% set this_month = spending[cat] %}
+{% set last_month = spending_last[cat] %}
+{% set diff = this_month - last_month %}
+{% set pct_change = (((this_month - last_month) / last_month) * 100) | round if last_month > 0 else 0 %}
+
+{% if this_month > 0 or last_month > 0 %}
+<div class="mb-3">
+    <div class="d-flex justify-content-between">
+        <strong>{{ cat }}</strong>
+        <span>
+            {{ this_month }} vs {{ last_month }}
+            {% if diff > 0 %}
+            <span class="text-danger">+{{ diff }} ({{ pct_change }}% more)</span>
+            {% elif diff < 0 %}
+            <span class="text-success">{{ diff }} ({{ pct_change }}% less)</span>
+            {% else %}
+            <span class="text-muted">No change</span>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endif %}
+{% endfor %}
+
 {% endblock %}

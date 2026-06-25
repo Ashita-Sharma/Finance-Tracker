@@ -1,5 +1,6 @@
 from flask import Flask, redirect, url_for, render_template, request, flash, send_file
 from flask import session
+from dateutil.relativedelta import relativedelta
 import os
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -236,13 +237,34 @@ def analyze():
                 f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = 'income' AND category = ? AND user_id = ?{date_filter}",
                 (cat, session['user_id'], *date_params))
             income_data.append(cursor.fetchone()[0])
+    current_month = date.today().strftime('%Y-%m')
+    last_month = (date.today() - relativedelta(months=1)).strftime('%Y-%m')
+
+    spending_this_month = {}
+    spending_last_month = {}
+
+    with sqlite3.connect("database.db") as conn:
+        cursor = conn.cursor()
+        for cat in categories:
+            cursor.execute(
+                "SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = 'expense' AND category = ? AND user_id = ? AND date_of LIKE ?",
+                (cat, session['user_id'], f"{current_month}%"))
+            spending_this_month[cat] = cursor.fetchone()[0]
+
+            cursor.execute(
+                "SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = 'expense' AND category = ? AND user_id = ? AND date_of LIKE ?",
+                (cat, session['user_id'], f"{last_month}%"))
+            spending_last_month[cat] = cursor.fetchone()[0]
 
     return render_template('analyze.html',
                            categories=categories,
                            expense_data=expense_data,
                            income_data=income_data,
                            selected_month=selected_month,
-                           selected_year=selected_year)
+                           selected_year=selected_year,
+                           spending=spending_this_month,
+                           spending_last=spending_last_month
+                           )
 
 @app.route('/budget', methods=['GET', 'POST'])
 def budget():
