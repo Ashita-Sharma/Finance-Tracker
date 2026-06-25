@@ -7,6 +7,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from datetime import date
 import csv
 import io
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(BASE_DIR, "database.db")
 
 
 
@@ -21,7 +25,7 @@ def reroute():
 
 
 def init_db():
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         conn.execute("""
         CREATE TABLE IF NOT EXISTS PARTICIPANTS (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -62,7 +66,7 @@ def generate_recurring(user_id):
     current_month = date.today().strftime('%Y-%m')  # e.g. "2026-06"
     today = date.today().isoformat()                # e.g. "2026-06-15"
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
 
         cursor.execute(
@@ -99,7 +103,7 @@ def dashboard():
         category = request.form['Category']
         recurring = request.form['Recurring'] or None  # converts "" to None
 
-        with sqlite3.connect("database.db") as conn:
+        with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 "INSERT INTO TASKS (user_id, expense_name, amount, note, date_of, type, category, recurring) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
@@ -156,17 +160,17 @@ def dashboard():
     elif sort_by == 'category':
         query += " ORDER BY CASE category WHEN 'home' THEN 1 WHEN 'work' THEN 2 WHEN 'personal' THEN 3 END"
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute(query, params)
         tasks = cursor.fetchall()
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM TASKS WHERE user_id = ?", (session['user_id'],))
         total = cursor.fetchone()[0]
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute(
             f"SELECT COALESCE(SUM(amount),0) FROM BUDGETS WHERE category = ? AND user_id = ?",
@@ -182,7 +186,7 @@ def dashboard():
         personal = cursor.fetchone()[0]
 
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute(
             f"SELECT COALESCE(SUM(amount),0) FROM TASKS WHERE type = ? AND user_id = ?{date_filter}",
@@ -225,7 +229,7 @@ def analyze():
     expense_data = []
     income_data = []
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         for cat in categories:
             cursor.execute(
@@ -243,7 +247,7 @@ def analyze():
     spending_this_month = {}
     spending_last_month = {}
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         for cat in categories:
             cursor.execute(
@@ -277,7 +281,7 @@ def budget():
         for cat in categories:
             amount = request.form.get(cat, 0)
             if amount:
-                with sqlite3.connect("database.db") as conn:
+                with sqlite3.connect(DB_PATH) as conn:
                     cursor = conn.cursor()
                     cursor.execute(
                         "INSERT OR REPLACE INTO BUDGETS (user_id, category, amount) VALUES (?, ?, ?)",
@@ -288,7 +292,7 @@ def budget():
         return redirect(url_for('budget'))
 
     # Fetch existing budgets
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT category, amount FROM BUDGETS WHERE user_id = ?", (session['user_id'],))
         budget_data = {row[0]: row[1] for row in cursor.fetchall()}
@@ -296,7 +300,7 @@ def budget():
     # Fetch actual spending per category for current month
     current_month = date.today().strftime('%Y-%m')
     spending = {}
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         for cat in categories:
             cursor.execute(
@@ -314,7 +318,7 @@ def export():
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM TASKS WHERE user_id = ?", (session['user_id'],))
         headers = [description[0] for description in cursor.description]
@@ -363,7 +367,7 @@ def sign_up():
         if len(password) < 8:
             flash("Password must be at least 8 characters!", "warning")
             return redirect(url_for('sign_up'))
-        with sqlite3.connect("database.db") as conn:
+        with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT 1 FROM PARTICIPANTS WHERE email = ?", (email,))
             user = cursor.fetchone()
@@ -376,7 +380,7 @@ def sign_up():
             return redirect(url_for('sign_up'))
 
         hashed_password = generate_password_hash(password)
-        with sqlite3.connect("database.db") as users:
+        with sqlite3.connect(DB_PATH) as users:
             cursor = users.cursor()
             cursor.execute("INSERT INTO PARTICIPANTS \
             (username,email,password) VALUES (?,?,?)",
@@ -396,7 +400,7 @@ def login():
         email = request.form['enteredEmail']
         password = request.form['enteredPassword']
 
-        with sqlite3.connect("database.db") as conn:
+        with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute("SELECT id, username, password FROM PARTICIPANTS WHERE email = ?", (email,))
             user = cursor.fetchone()
@@ -424,7 +428,7 @@ def profile():
         confirm_password = request.form['confirm_new_password']
 
         # Update email and username
-        with sqlite3.connect("database.db") as conn:
+        with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 "UPDATE PARTICIPANTS SET email = ?, username = ? WHERE id = ?",
@@ -436,7 +440,7 @@ def profile():
         # If user wants to change password
         if password and new_password:
             # Verify current password first
-            with sqlite3.connect("database.db") as conn:
+            with sqlite3.connect(DB_PATH) as conn:
                 cursor = conn.cursor()
                 cursor.execute("SELECT password FROM PARTICIPANTS WHERE id = ?", (session['user_id'],))
                 user = cursor.fetchone()
@@ -450,7 +454,7 @@ def profile():
                 return redirect(url_for('profile'))
 
             hashed_password = generate_password_hash(new_password)
-            with sqlite3.connect("database.db") as conn:
+            with sqlite3.connect(DB_PATH) as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     "UPDATE PARTICIPANTS SET password = ? WHERE id = ?",
@@ -463,7 +467,7 @@ def profile():
 
         return redirect(url_for('dashboard'))
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT email, username FROM PARTICIPANTS WHERE id = ?", (session['user_id'],))
         user = cursor.fetchone()
@@ -475,7 +479,7 @@ def delete_task(task_id):
     if 'user_id' not in session:
         return redirect(url_for('login'))
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("DELETE FROM TASKS WHERE id = ? AND user_id = ?", (task_id, session['user_id']))
         conn.commit()
@@ -496,7 +500,7 @@ def edit_log(task_id):
         type = request.form['Type']
         category = request.form['Category']
 
-        with sqlite3.connect("database.db") as conn:
+        with sqlite3.connect(DB_PATH) as conn:
             cursor = conn.cursor()
             cursor.execute(
                 "UPDATE TASKS SET expense_name = ?, amount=?, note = ?, date_of = ?, type = ?, category = ? WHERE id = ? AND user_id = ?",
@@ -507,7 +511,7 @@ def edit_log(task_id):
         flash("Expense updated!", "success")
         return redirect(url_for('dashboard'))
 
-    with sqlite3.connect("database.db") as conn:
+    with sqlite3.connect(DB_PATH) as conn:
         cursor = conn.cursor()
         cursor.execute("SELECT * FROM TASKS WHERE id = ? AND user_id = ?", (task_id, session['user_id']))
         task = cursor.fetchone()
