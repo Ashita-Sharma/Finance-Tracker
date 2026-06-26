@@ -112,13 +112,13 @@ Stores user-defined budgets.
 ## Screenshots
 
 ### Dashboard
-(Add Screenshot Here)
+![Image of the website's dashboard](Screenshots/Screenshot 2026-06-25 155426.png)
 
 ### Analytics Page
-(Add Screenshot Here)
+![Image of the website's analytics page](Screenshots/Screenshot 2026-06-25 155514.png)
 
 ### Budget Management
-(Add Screenshot Here)
+![Image of the website's budget page](Screenshots/Screenshot 2026-06-25 155437.png)
 
 ---
 
@@ -127,7 +127,7 @@ Stores user-defined budgets.
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/FinanceTracker.git
+git clone https://github.com/Ashita-Sharma/FinanceTracker.git
 ```
 
 Navigate to the project folder:
@@ -163,7 +163,7 @@ http://127.0.0.1:5001
 - Investment portfolio management
 - Data visualizations with Plotly
 - Budget recommendations
-- Dark mode
+- Dark mode toggle
 - REST API support
 - Multi-currency support
 - Cloud database integration
