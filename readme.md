@@ -112,13 +112,13 @@ Stores user-defined budgets.
 ## Screenshots
 
 ### Dashboard
-![Image of the website's dashboard](Screenshots/Screenshot 2026-06-25 155426.png)
+![Image of the website's dashboard](Screenshots/img1.png)
 
 ### Analytics Page
-![Image of the website's analytics page](Screenshots/Screenshot 2026-06-25 155514.png)
+![Image of the website's analytics page](Screenshots/img2.png)
 
 ### Budget Management
-![Image of the website's budget page](Screenshots/Screenshot 2026-06-25 155437.png)
+![Image of the website's budget page](Screenshots/img3.png)
 
 ---
 
